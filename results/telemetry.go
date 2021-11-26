@@ -152,6 +152,11 @@ func Record(w http.ResponseWriter, r *http.Request) {
 	}
 
 	ipAddr, _, _ := net.SplitHostPort(r.RemoteAddr)
+	if hdr := r.Header.Get("X-Forwarded-For"); hdr != "" {
+		hdrs := strings.Split(hdr, ", ")
+		ipAddr = hdrs[0]
+	}
+
 	userAgent := r.UserAgent()
 	language := r.Header.Get("Accept-Language")
 

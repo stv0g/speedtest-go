@@ -175,12 +175,17 @@ func getIP(w http.ResponseWriter, r *http.Request) {
 	var ret results.Result
 
 	clientIP := r.RemoteAddr
-	clientIP = strings.ReplaceAll(clientIP, "::ffff:", "")
+	if hdr := r.Header.Get("X-Forwarded-For"); hdr != "" {
+		hdrs := strings.Split(hdr, ", ")
+		clientIP = hdrs[0]
+	}
 
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err == nil {
 		clientIP = ip
 	}
+
+	clientIP = strings.ReplaceAll(clientIP, "::ffff:", "")
 
 	isSpecialIP := true
 	switch {
